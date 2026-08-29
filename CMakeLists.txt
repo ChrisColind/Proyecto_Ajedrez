@@ -5,7 +5,18 @@ project(Proyecto_Ajedrez LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(Proyecto_Ajedrez main.cpp)
+add_executable(Proyecto_Ajedrez main.cpp
+    pieza.h pieza.cpp
+    rey.h rey.cpp
+    torre.h torre.cpp
+    peon.h peon.cpp
+    caballo.h caballo.cpp
+    tablero.h tablero.cpp
+    jugador.h jugador.cpp
+    movimiento.h movimiento.cpp
+    historial.h historial.cpp
+    gestorpartida.h gestorpartida.cpp
+    ranking.h ranking.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS Proyecto_Ajedrez
