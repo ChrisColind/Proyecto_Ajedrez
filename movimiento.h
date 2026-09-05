@@ -1,10 +1,19 @@
 #ifndef MOVIMIENTO_H
 #define MOVIMIENTO_H
 
-class Movimiento
-{
+class Movimiento{
+private:
+    int filaOrigen;
+    int columnaOrigen;
+    int filaDestino;
+    int columnaDestino;
+
 public:
-    Movimiento();
+    Movimiento(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino);
+    int getFilaOrigen();
+    int getColumnaOrigen();
+    int getFilaDestino();
+    int getColumnaDestino();
 };
 
-#endif // MOVIMIENTO_H
+#endif

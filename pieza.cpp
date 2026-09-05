@@ -1,10 +1,10 @@
 #include "pieza.h"
 
 Pieza::Pieza(char color, char simbolo, int fila, int columna){
-    this->color = color;
-    this->simbolo = simbolo;
-    this->fila = fila;
-    this->columna = columna;
+    this->color=color;
+    this->simbolo=simbolo;
+    this->fila=fila;
+    this->columna=columna;
 }
 
 Pieza::~Pieza(){
@@ -25,4 +25,13 @@ int Pieza::getFila() const{
 
 int Pieza::getColumna() const{
     return columna;
+}
+
+void Pieza::setPosicion(int fila, int columna){
+    this->fila=fila;
+    this->columna=columna;
+}
+
+bool Pieza::esMovimientoValido(int filaDestino, int columnaDestino, bool hayPiezaDestino, bool hayPiezaIntermedia){
+    return false;
 }

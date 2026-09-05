@@ -1,10 +1,13 @@
 #ifndef PEON_H
 #define PEON_H
 
-class Peon
-{
+#include "pieza.h"
+
+class Peon : public Pieza{
 public:
-    Peon();
+    Peon(char color, int fila, int columna);
+
+    bool esMovimientoValido(int filaDestino, int columnaDestino, bool hayPiezaDestino, bool hayPiezaIntermedia) override;
 };
 
-#endif // PEON_H
+#endif

@@ -1,32 +1,30 @@
 #ifndef TABLERO_H
 #define TABLERO_H
 
+#include <string>
 #include "pieza.h"
-/*#include "Rey.h"
-#include "Torre.h"
-#include "Caballo.h"
-#include "Peon.h"
-*/
+
+using namespace std;
 
 class Tablero{
 private:
     Pieza* casillas[8][8];
 
-    //Deja todas las casillas en nullptr antes de colocar las piezas
     void vaciarCasillas();
-
-    //Crea con new las 16 piezas de cada color en su posicion inicial
     void inicializarPosicionInicial();
-
-    //Recorre las 64 casillas y hace delete de cada Pieza que no sea nullptr
     void liberarMemoria();
 
 public:
-    Tablero(); //constructor
-    ~Tablero(); //destructor
+    Tablero();
+    ~Tablero();
 
-    //Dibuja el tablero en consola
+    bool convertirCoordenada(string texto, int &fila, int &columna);
+    bool hayPiezaEn(int fila, int columna);
+    char colorEnCasilla(int fila, int columna);
+    char simboloEnCasilla(int fila, int columna);
+    bool movimientoValido(int filaOrigen, int columnaOrigen,int filaDestino, int columnaDestino);
+    void moverPieza(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino);
     void imprimir() const;
 };
 
-#endif // TABLERO_H
+#endif
