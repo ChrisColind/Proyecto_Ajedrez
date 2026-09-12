@@ -5,6 +5,10 @@
 #include "tablero.h"
 #include "peon.h"
 #include "rey.h"
+#include "torre.h"
+#include "caballo.h"
+#include "alfil.h"
+#include "reina.h"
 #include "movimiento.h"
 
 using namespace std;
@@ -29,15 +33,23 @@ void Tablero::vaciarCasillas(){
 
 void Tablero::inicializarPosicionInicial(){
 
-    char simbolosMayores[8]={'T', 'C', 'A', 'R', 'K', 'A', 'C', 'T'};
-
     for(int columna=0 ; columna<8 ; columna++){
-        if(columna==4){
+
+        if(columna==0 || columna==7){
+            casillas[0][columna]=new Torre('A',0,columna);
+            casillas[7][columna]=new Torre('R',7,columna);
+        }else if(columna==1 || columna==6){
+            casillas[0][columna]=new Caballo('A',0,columna);
+            casillas[7][columna]=new Caballo('R',7,columna);
+        }else if(columna==2 || columna==5){
+            casillas[0][columna]=new Alfil('A',0,columna);
+            casillas[7][columna]=new Alfil('R',7,columna);
+        }else if(columna==3){
+            casillas[0][columna]=new Reina('A',0,columna);
+            casillas[7][columna]=new Reina('R',7,columna);
+        }else{
             casillas[0][columna]=new Rey('A',0,columna);
             casillas[7][columna]=new Rey('R',7,columna);
-        }else{
-            casillas[0][columna]=new Pieza('A',simbolosMayores[columna],0,columna);
-            casillas[7][columna]=new Pieza('R',simbolosMayores[columna],7,columna);
         }
 
         casillas[1][columna]=new Peon('A',1,columna);
@@ -60,22 +72,56 @@ void Tablero::liberarMemoria(){
 bool Tablero::movimientoValido(int filaOrigen, int columnaOrigen,int filaDestino, int columnaDestino){
     Movimiento movimiento(filaOrigen,columnaOrigen,filaDestino,columnaDestino);
     bool hayPiezaDestino=hayPiezaEn(movimiento.getFilaDestino(),movimiento.getColumnaDestino());
-    int direccion;
+    bool hayObstaculo=hayObstaculoEnTrayectoria(filaOrigen,columnaOrigen,movimiento.getFilaDestino(),movimiento.getColumnaDestino());
 
-    if(casillas[filaOrigen][columnaOrigen]->getColor()=='R'){
-        direccion=-1;
-    }else{
-        direccion=1;
+    return casillas[filaOrigen][columnaOrigen]->esMovimientoValido(movimiento.getFilaDestino(),movimiento.getColumnaDestino(),hayPiezaDestino,hayObstaculo);
+}
+
+bool Tablero::hayObstaculoEnTrayectoria(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino){
+    int diferenciaFila=filaDestino-filaOrigen;
+    int diferenciaColumna=columnaDestino-columnaOrigen;
+
+    int pasoFila=0;
+    if(diferenciaFila>0){
+        pasoFila=1;
+    }
+    if(diferenciaFila<0){
+        pasoFila=-1;
     }
 
-    int filaIntermedia=filaOrigen+direccion;
-    bool hayPiezaIntermedia=false;
-
-    if(filaIntermedia>=0 && filaIntermedia<8){
-        hayPiezaIntermedia=hayPiezaEn(filaIntermedia,columnaOrigen);
+    int pasoColumna=0;
+    if(diferenciaColumna>0){
+        pasoColumna=1;
+    }
+    if(diferenciaColumna<0){
+        pasoColumna=-1;
     }
 
-    return casillas[filaOrigen][columnaOrigen]->esMovimientoValido(movimiento.getFilaDestino(),movimiento.getColumnaDestino(),hayPiezaDestino,hayPiezaIntermedia);
+    int filaAbsoluta=(diferenciaFila<0) ? -diferenciaFila : diferenciaFila;
+    int columnaAbsoluta=(diferenciaColumna<0) ? -diferenciaColumna : diferenciaColumna;
+
+    bool esLineaRecta=(diferenciaFila==0 || diferenciaColumna==0);
+    bool esDiagonal=(filaAbsoluta==columnaAbsoluta);
+
+    //movimientos que no son en linea recta ni en diagonal (ej. el caballo)
+    //no tienen "trayectoria" que revisar, por eso no hay obstaculo
+    if(!esLineaRecta && !esDiagonal){
+        return false;
+    }
+
+    int filaActual=filaOrigen+pasoFila;
+    int columnaActual=columnaOrigen+pasoColumna;
+
+    while(filaActual!=filaDestino || columnaActual!=columnaDestino){
+        if(hayPiezaEn(filaActual,columnaActual)){
+            return true;
+        }
+
+        filaActual=filaActual+pasoFila;
+        columnaActual=columnaActual+pasoColumna;
+    }
+
+    return false;
 }
 
 bool Tablero::convertirCoordenada(string texto, int &fila, int &columna){

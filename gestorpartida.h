@@ -2,10 +2,13 @@
 #define GESTORPARTIDA_H
 
 #include "tablero.h"
+#include "jugador.h"
 
 class GestorPartida{
 private:
     Tablero* tablero;
+    Jugador* jugadorRojo;
+    Jugador* jugadorAzul;
     char turno;
 
     void cambiarTurno();
@@ -17,6 +20,7 @@ public:
 
     void menu();
     void iniciarPartida();
+    void mostrarAyuda();
 };
 
 #endif

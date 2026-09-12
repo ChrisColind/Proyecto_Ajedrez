@@ -16,7 +16,10 @@ add_executable(Proyecto_Ajedrez main.cpp
     movimiento.h movimiento.cpp
     historial.h historial.cpp
     gestorpartida.h gestorpartida.cpp
-    ranking.h ranking.cpp)
+    ranking.h ranking.cpp
+    alfil.h alfil.cpp
+    reina.h reina.cpp
+    jugador.h jugador.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS Proyecto_Ajedrez

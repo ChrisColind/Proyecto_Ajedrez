@@ -13,6 +13,7 @@ private:
     void vaciarCasillas();
     void inicializarPosicionInicial();
     void liberarMemoria();
+    bool hayObstaculoEnTrayectoria(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino);
 
 public:
     Tablero();

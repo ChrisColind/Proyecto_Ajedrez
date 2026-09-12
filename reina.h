@@ -1,11 +1,11 @@
-#ifndef TORRE_H
-#define TORRE_H
+#ifndef REINA_H
+#define REINA_H
 
 #include "pieza.h"
 
-class Torre : public Pieza{
+class Reina : public Pieza{
 public:
-    Torre(char color, int fila, int columna);
+    Reina(char color, int fila, int columna);
 
     bool esMovimientoValido(int filaDestino, int columnaDestino, bool hayPiezaDestino, bool hayPiezaIntermedia) override;
 };

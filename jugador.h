@@ -1,10 +1,27 @@
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
-class Jugador
-{
+#include <string>
+
+using namespace std;
+
+class Jugador{
+private:
+    string nombre;
+    int partidasJugadas;
+    int partidasGanadas;
+    int puntaje;
+
 public:
-    Jugador();
+    Jugador(string nombre);
+
+    string getNombre() const;
+    int getPartidasJugadas() const;
+    int getPartidasGanadas() const;
+    int getPuntaje() const;
+
+    void registrarVictoria();
+    void registrarDerrota();
 };
 
 #endif // JUGADOR_H
