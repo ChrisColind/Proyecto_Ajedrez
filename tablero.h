@@ -3,7 +3,7 @@
 
 #include <string>
 #include "pieza.h"
-
+#include <fstream>
 using namespace std;
 
 class Tablero{
@@ -25,7 +25,15 @@ public:
     char simboloEnCasilla(int fila, int columna);
     bool movimientoValido(int filaOrigen, int columnaOrigen,int filaDestino, int columnaDestino);
     void moverPieza(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino);
+    bool esPromocion(int fila, int columna);
+    void promocionarPeon(int fila, int columna);
+    bool enroqueValido(char color, bool esCorto);
+    void hacerEnroque(char color, bool esCorto);
     void imprimir() const;
+    void guardarEnArchivo(ofstream &archivo);
+    void cargarDesdeArchivo(ifstream &archivo);
+    bool estaEnJaque(char color);
+    bool dejaEnJaquePropio(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino);
 };
 
 #endif

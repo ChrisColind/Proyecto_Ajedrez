@@ -3,16 +3,24 @@
 
 #include "tablero.h"
 #include "jugador.h"
+#include "historial.h"
 
 class GestorPartida{
 private:
     Tablero* tablero;
     Jugador* jugadorRojo;
     Jugador* jugadorAzul;
+    Historial* historial;
     char turno;
 
     void cambiarTurno();
-    bool verificarGanador(char color);
+    bool esJaquemate(char color);
+    Jugador* login(string colorEtiqueta);
+    void jugarTurnos();
+    void guardarPartida();
+    Jugador* crearUsuario(string colorEtiqueta);
+    Jugador* obtenerJugador(string colorEtiqueta);
+
 
 public:
     GestorPartida();
@@ -20,6 +28,7 @@ public:
 
     void menu();
     void iniciarPartida();
+    void cargarPartida();
     void mostrarAyuda();
 };
 
