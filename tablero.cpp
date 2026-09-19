@@ -1,5 +1,7 @@
 #include <iostream>
+#ifdef _WIN32
 #include <windows.h>
+#endif
 #include <cctype>
 
 #include "tablero.h"
@@ -304,7 +306,9 @@ void Tablero::hacerEnroque(char color, bool esCorto){
 
 
 void Tablero::imprimir() const{
+#ifdef _WIN32
     HANDLE consola=GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
     cout<<"\n    A   B   C   D   E   F   G   H\n";
     cout<<"  +---+---+---+---+---+---+---+---+\n";
 
@@ -319,13 +323,25 @@ void Tablero::imprimir() const{
             }else{
 
                 if(pieza->getColor()=='R'){
+#ifdef _WIN32
                     SetConsoleTextAttribute(consola, 12);
+#else
+                    cout<<"\033[31m";
+#endif
                 }else{
+#ifdef _WIN32
                     SetConsoleTextAttribute(consola, 9);
+#else
+                    cout<<"\033[34m";
+#endif
                 }
 
                 cout<<" "<<pieza->getSimbolo()<<" ";
+#ifdef _WIN32
                 SetConsoleTextAttribute(consola, 7);
+#else
+                cout<<"\033[0m";
+#endif
                 cout<<"|";
             }
         }
