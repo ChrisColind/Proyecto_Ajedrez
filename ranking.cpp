@@ -10,6 +10,10 @@ Ranking::Ranking(){
 }
 
 Ranking::~Ranking(){
+    for(int i=0 ; i<cantidad ; i++){
+        delete jugadores[i];
+    }
+
     delete[] jugadores;
 }
 void Ranking::agregarJugador(Jugador* jugador){
@@ -28,4 +32,26 @@ void Ranking::agregarJugador(Jugador* jugador){
 
     jugadores[cantidad]=jugador;
     cantidad++;
+}
+
+void Ranking::ordenarPorPuntaje(){
+    for(int i=0 ; i<cantidad-1 ; i++){
+        for(int j=0 ; j<cantidad-1-i ; j++){
+            if(jugadores[j]->getPuntaje() < jugadores[j+1]->getPuntaje()){
+                Jugador* temporal=jugadores[j];
+                jugadores[j]=jugadores[j+1];
+                jugadores[j+1]=temporal;
+            }
+        }
+    }
+}
+
+void Ranking::mostrarRanking(){
+    ordenarPorPuntaje();
+
+    cout<<"===== RANKING DE JUGADORES ====="<<endl;
+
+    for(int i=0 ; i<cantidad ; i++){
+        cout<<(i+1)<<". "<<jugadores[i]->getNombre()<<" | Puntaje: "<<jugadores[i]->getPuntaje()<<" | Partidas Jugadas: "<<jugadores[i]->getPartidasJugadas()<<" | Partidas Ganadas: "<<jugadores[i]->getPartidasGanadas()<<endl;
+    }
 }

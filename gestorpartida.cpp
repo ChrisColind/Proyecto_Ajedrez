@@ -2,6 +2,7 @@
 #include "gestorpartida.h"
 #include <limits>
 #include <fstream>
+#include <filesystem>
 using namespace std;
 
 GestorPartida::GestorPartida(){
@@ -103,6 +104,23 @@ Jugador* GestorPartida::obtenerJugador(string colorEtiqueta){
     return jugador;
 }
 
+void GestorPartida::mostrarRanking(){
+    Ranking ranking;
+
+    for(const auto &archivo : filesystem::directory_iterator("Jugadores")){
+        string nombreArchivo=archivo.path().filename().string();
+        string nombreJugador=nombreArchivo.substr(0,nombreArchivo.find(".txt"));
+
+        Jugador* jugador=Jugador::cargarDesdeArchivo(nombreJugador);
+
+        if(jugador!=nullptr){
+            ranking.agregarJugador(jugador);
+        }
+    }
+
+    ranking.mostrarRanking();
+}
+
 bool GestorPartida::esJaquemate(char color){//revisa si hay una forma de hacer que el rey salga de jaque, true significa que no encontro ni un movimiento posible, false que si encontro
     if(!tablero->estaEnJaque(color)){
         return false;
@@ -148,14 +166,13 @@ void GestorPartida::menu(){
         cout<<"1. Nueva partida"<<endl;
         cout<<"2. Cargar partida"<<endl;
         cout<<"3. Ver ranking"<<endl;
-        cout<<"4. Como jugar"<<endl;
-        cout<<"5. Salir"<<endl;
+        cout<<"4. Salir"<<endl;
         cout<<"Seleccione una opcion: "<<endl;
 
-        while(!(cin>>opcion) || (opcion<1 || opcion>5)){
+        while(!(cin>>opcion) || (opcion<1 || opcion>4)){
             cin.clear();
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            cout<<"[ERROR] Ingrese un dato correcto (1 - 5)"<<endl;
+            cout<<"[ERROR] Ingrese un dato correcto (1 - 4)"<<endl;
         }
 
         switch(opcion){
@@ -168,19 +185,15 @@ void GestorPartida::menu(){
             break;
 
         case 3:
-            cout<<"nada"<<endl;
+            mostrarRanking();
             break;
 
         case 4:
-            mostrarAyuda();
-            break;
-
-        case 5:
             cout<<"[Cerrando el juego...]"<<endl;
             break;
         }
 
-    }while(opcion!=5);
+    }while(opcion!=4);
 }
 
 void GestorPartida::iniciarPartida(){
@@ -191,6 +204,12 @@ void GestorPartida::iniciarPartida(){
     if(jugadorAzul!=nullptr){
         delete jugadorAzul;
     }
+
+    delete tablero;
+    tablero=new Tablero();
+
+    delete historial;
+    historial=new Historial();
 
     jugadorRojo=obtenerJugador("Rojo");
     jugadorAzul=obtenerJugador("Azul");
@@ -274,6 +293,11 @@ void GestorPartida::jugarTurnos(){
             continue;
         }
 
+        if(tablero->dejaEnJaquePropio(filaOrigen,columnaOrigen,filaDestino,columnaDestino)){
+            cout<<"[ERROR] Ese movimiento deja a tu Rey en jaque"<<endl;
+            continue;
+        }
+
         tablero->moverPieza(filaOrigen,columnaOrigen,filaDestino,columnaDestino);
         historial->agregarMovimiento(new Movimiento(filaOrigen,columnaOrigen,filaDestino,columnaDestino));
 
@@ -308,7 +332,27 @@ void GestorPartida::jugarTurnos(){
 }
 
 void GestorPartida::guardarPartida(){
-    ofstream archivo("Partidas/partida_guardada.txt");
+    string nombrePartida;
+
+    cout<<"Nombre para guardar la partida: ";
+    cin>>nombrePartida;
+
+    ifstream prueba("Partidas/"+nombrePartida+".txt");
+
+    if(prueba.good()){
+        prueba.close();
+
+        char respuesta;
+        cout<<"Ya existe una partida con ese nombre, desea sobreescribirla? (s/n): ";
+        cin>>respuesta;
+
+        if(respuesta!='s' && respuesta!='S'){
+            cout<<"Partida no guardada."<<endl;
+            return;
+        }
+    }
+
+    ofstream archivo("Partidas/"+nombrePartida+".txt");
 
     archivo<<turno<<endl;
     archivo<<jugadorRojo->getNombre()<<endl;
@@ -322,12 +366,55 @@ void GestorPartida::guardarPartida(){
 }
 
 void GestorPartida::cargarPartida(){
-    ifstream archivo("Partidas/partida_guardada.txt");
+    int capacidad=4;
+    int cantidad=0;
+    string* nombresPartidas=new string[capacidad];
 
-    if(!archivo.good()){
+    for(const auto &archivo : filesystem::directory_iterator("Partidas")){
+        string nombreArchivo=archivo.path().filename().string();
+        string nombrePartida=nombreArchivo.substr(0,nombreArchivo.find(".txt"));
+
+        if(cantidad==capacidad){
+            int nuevaCapacidad=capacidad*2;
+            string* nuevoArreglo=new string[nuevaCapacidad];
+
+            for(int i=0 ; i<cantidad ; i++){
+                nuevoArreglo[i]=nombresPartidas[i];
+            }
+
+            delete[] nombresPartidas;
+            nombresPartidas=nuevoArreglo;
+            capacidad=nuevaCapacidad;
+        }
+
+        nombresPartidas[cantidad]=nombrePartida;
+        cantidad++;
+    }
+
+    if(cantidad==0){
         cout<<"[ERROR] No hay ninguna partida guardada"<<endl;
+        delete[] nombresPartidas;
         return;
     }
+
+    cout<<"\n===== PARTIDAS GUARDADAS ====="<<endl;
+    for(int i=0 ; i<cantidad ; i++){
+        cout<<(i+1)<<". "<<nombresPartidas[i]<<endl;
+    }
+
+    int opcion;
+    cout<<"Seleccione la partida a cargar: ";
+
+    while(!(cin>>opcion) || (opcion<1 || opcion>cantidad)){
+        cin.clear();
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        cout<<"[ERROR] Ingrese un numero valido (1 - "<<cantidad<<"): ";
+    }
+
+    string nombreElegido=nombresPartidas[opcion-1];
+    delete[] nombresPartidas;
+
+    ifstream archivo("Partidas/"+nombreElegido+".txt");
 
     string nombreRojo,nombreAzul;
 
@@ -351,23 +438,4 @@ void GestorPartida::cargarPartida(){
     archivo.close();
 
     jugarTurnos();
-}
-
-void GestorPartida::mostrarAyuda(){
-    cout<<endl;
-    cout<<"===***INTRUCCIONES PARA JUGAR***==="<<endl;
-    cout<<"Cada casilla se nombra con una letra de columna (A-H) y un numero de fila (1-8), ej: ORIGEN: E2, DESTINO: E3."<<endl;
-    cout<<"En tu turno debes escribir la casilla de origen y luego la casilla de destino."<<endl;
-    cout<<"\n====MOVIMIENTOS DE PIEZA===="<<endl;
-    cout<<"Peon (P): avanza 1 casilla al frente (2 SI ES TU PRIMER MOVIMIENTO) y captura en diagonal."<<endl;
-    cout<<"Torre (T): se mueve en linea recta, la cantidad de casillas que quiera (FILA O COLUMNA)."<<endl;
-    cout<<"Caballo (C): se mueve en forma de L (2 y 1) y es la unica pieza que salta sobre otras."<<endl;
-    cout<<"Alfil (A): se mueve en diagonal, la cantidad de casillas que quieras."<<endl;
-    cout<<"Reina (R): combina el movimiento de la Torre y el Alfil (RECTA O DIAGONAL)."<<endl;
-    cout<<"Rey (K): se mueve 1 sola casilla, en cualquier direccion(NO LA PIERDAS)."<<endl;
-    cout<<"\n===COMO GANAR Y COMO PERDER==="<<endl;
-    cout<<"(GANAS) si capturas al Rey del equipo contrario."<<endl;
-    cout<<"(PIERDES) si tu Rey es capturado por el equipo contrario."<<endl;
-    cout<<"Ninguna pieza puede capturar a otra pieza de su mismo color."<<endl;
-    cout<<"\nSi deseas salir de una partida en juego solo escribes 'salir' cuando sea tu turno."<<endl;
 }

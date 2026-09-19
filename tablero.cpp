@@ -26,9 +26,11 @@ Tablero::~Tablero(){
 
 void Tablero::vaciarCasillas(){
 
+    casillas=new Pieza*[64];
+
     for(int fila=0 ; fila<8 ; fila++){
         for(int columna=0 ; columna<8 ; columna++){
-            casillas[fila][columna]=nullptr;
+            casillas[(fila)*8+(columna)]=nullptr;
         }
     }
 }
@@ -38,37 +40,39 @@ void Tablero::inicializarPosicionInicial(){
     for(int columna=0 ; columna<8 ; columna++){
 
         if(columna==0 || columna==7){
-            casillas[0][columna]=new Torre('A',0,columna);
-            casillas[7][columna]=new Torre('R',7,columna);
+            casillas[(0)*8+(columna)]=new Torre('A',0,columna);
+            casillas[(7)*8+(columna)]=new Torre('R',7,columna);
         }else if(columna==1 || columna==6){
-            casillas[0][columna]=new Caballo('A',0,columna);
-            casillas[7][columna]=new Caballo('R',7,columna);
+            casillas[(0)*8+(columna)]=new Caballo('A',0,columna);
+            casillas[(7)*8+(columna)]=new Caballo('R',7,columna);
         }else if(columna==2 || columna==5){
-            casillas[0][columna]=new Alfil('A',0,columna);
-            casillas[7][columna]=new Alfil('R',7,columna);
+            casillas[(0)*8+(columna)]=new Alfil('A',0,columna);
+            casillas[(7)*8+(columna)]=new Alfil('R',7,columna);
         }else if(columna==3){
-            casillas[0][columna]=new Reina('A',0,columna);
-            casillas[7][columna]=new Reina('R',7,columna);
+            casillas[(0)*8+(columna)]=new Reina('A',0,columna);
+            casillas[(7)*8+(columna)]=new Reina('R',7,columna);
         }else{
-            casillas[0][columna]=new Rey('A',0,columna);
-            casillas[7][columna]=new Rey('R',7,columna);
+            casillas[(0)*8+(columna)]=new Rey('A',0,columna);
+            casillas[(7)*8+(columna)]=new Rey('R',7,columna);
         }
 
-        casillas[1][columna]=new Peon('A',1,columna);
-        casillas[6][columna]=new Peon('R',6,columna);
+        casillas[(1)*8+(columna)]=new Peon('A',1,columna);
+        casillas[(6)*8+(columna)]=new Peon('R',6,columna);
     }
 }
 
 void Tablero::liberarMemoria(){
     for(int fila=0 ; fila<8 ; fila++){
         for(int columna=0 ; columna<8 ; columna++){
-            if(casillas[fila][columna]!=nullptr){
-                delete casillas[fila][columna];
+            if(casillas[(fila)*8+(columna)]!=nullptr){
+                delete casillas[(fila)*8+(columna)];
 
-                casillas[fila][columna]=nullptr;
+                casillas[(fila)*8+(columna)]=nullptr;
             }
         }
     }
+
+    delete[] casillas;
 }
 
 bool Tablero::movimientoValido(int filaOrigen, int columnaOrigen,int filaDestino, int columnaDestino){
@@ -76,7 +80,7 @@ bool Tablero::movimientoValido(int filaOrigen, int columnaOrigen,int filaDestino
     bool hayPiezaDestino=hayPiezaEn(movimiento.getFilaDestino(),movimiento.getColumnaDestino());
     bool hayObstaculo=hayObstaculoEnTrayectoria(filaOrigen,columnaOrigen,movimiento.getFilaDestino(),movimiento.getColumnaDestino());
 
-    return casillas[filaOrigen][columnaOrigen]->esMovimientoValido(movimiento.getFilaDestino(),movimiento.getColumnaDestino(),hayPiezaDestino,hayObstaculo);
+    return casillas[(filaOrigen)*8+(columnaOrigen)]->esMovimientoValido(movimiento.getFilaDestino(),movimiento.getColumnaDestino(),hayPiezaDestino,hayObstaculo);
 }
 
 bool Tablero::hayObstaculoEnTrayectoria(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino){
@@ -148,15 +152,15 @@ bool Tablero::convertirCoordenada(string texto, int &fila, int &columna){
 }
 
 bool Tablero::hayPiezaEn(int fila, int columna){
-    return casillas[fila][columna]!=nullptr;
+    return casillas[(fila)*8+(columna)]!=nullptr;
 }
 
 char Tablero::colorEnCasilla(int fila, int columna){
-    return casillas[fila][columna]->getColor();
+    return casillas[(fila)*8+(columna)]->getColor();
 }
 
 char Tablero::simboloEnCasilla(int fila, int columna){
-    return casillas[fila][columna]->getSimbolo();
+    return casillas[(fila)*8+(columna)]->getSimbolo();
 }
 
 bool Tablero::estaEnJaque(char color){ //lo logico de revisar si un rey esta en peligro o no
@@ -181,7 +185,7 @@ bool Tablero::estaEnJaque(char color){ //lo logico de revisar si un rey esta en 
             if(hayPiezaEn(fila,columna) && colorEnCasilla(fila,columna)==colorContrario){
                 bool hayObstaculo=hayObstaculoEnTrayectoria(fila,columna,filaRey,columnaRey);
 
-                if(casillas[fila][columna]->esMovimientoValido(filaRey,columnaRey,true,hayObstaculo)){
+                if(casillas[(fila)*8+(columna)]->esMovimientoValido(filaRey,columnaRey,true,hayObstaculo)){
                     return true;
                 }
             }
@@ -192,31 +196,31 @@ bool Tablero::estaEnJaque(char color){ //lo logico de revisar si un rey esta en 
 }
 
 bool Tablero::dejaEnJaquePropio(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino){
-    char colorPieza=casillas[filaOrigen][columnaOrigen]->getColor();
+    char colorPieza=casillas[(filaOrigen)*8+(columnaOrigen)]->getColor();
 
-    Pieza* piezaOrigen=casillas[filaOrigen][columnaOrigen];
-    Pieza* piezaDestino=casillas[filaDestino][columnaDestino];
+    Pieza* piezaOrigen=casillas[(filaOrigen)*8+(columnaOrigen)];
+    Pieza* piezaDestino=casillas[(filaDestino)*8+(columnaDestino)];
 
-    casillas[filaDestino][columnaDestino]=piezaOrigen;
-    casillas[filaOrigen][columnaOrigen]=nullptr;
+    casillas[(filaDestino)*8+(columnaDestino)]=piezaOrigen;
+    casillas[(filaOrigen)*8+(columnaOrigen)]=nullptr;
 
     bool quedaEnJaque=estaEnJaque(colorPieza);
 
-    casillas[filaOrigen][columnaOrigen]=piezaOrigen;
-    casillas[filaDestino][columnaDestino]=piezaDestino;
+    casillas[(filaOrigen)*8+(columnaOrigen)]=piezaOrigen;
+    casillas[(filaDestino)*8+(columnaDestino)]=piezaDestino;
 
     return quedaEnJaque;
 }
 
 void Tablero::moverPieza(int filaOrigen, int columnaOrigen,int filaDestino, int columnaDestino){
 
-    if(casillas[filaDestino][columnaDestino]!=nullptr){
-        delete casillas[filaDestino][columnaDestino];
+    if(casillas[(filaDestino)*8+(columnaDestino)]!=nullptr){
+        delete casillas[(filaDestino)*8+(columnaDestino)];
     }
 
-    casillas[filaDestino][columnaDestino]=casillas[filaOrigen][columnaOrigen];
-    casillas[filaOrigen][columnaOrigen]=nullptr;
-    casillas[filaDestino][columnaDestino]->setPosicion(filaDestino, columnaDestino);
+    casillas[(filaDestino)*8+(columnaDestino)]=casillas[(filaOrigen)*8+(columnaOrigen)];
+    casillas[(filaOrigen)*8+(columnaOrigen)]=nullptr;
+    casillas[(filaDestino)*8+(columnaDestino)]->setPosicion(filaDestino, columnaDestino);
 }
 
 bool Tablero::esPromocion(int fila, int columna){
@@ -231,11 +235,11 @@ bool Tablero::esPromocion(int fila, int columna){
 }
 
 void Tablero::promocionarPeon(int fila, int columna){
-    char color=casillas[fila][columna]->getColor();
+    char color=casillas[(fila)*8+(columna)]->getColor();
 
-    delete casillas[fila][columna];
+    delete casillas[(fila)*8+(columna)];
 
-    casillas[fila][columna]=new Reina(color,fila,columna);
+    casillas[(fila)*8+(columna)]=new Reina(color,fila,columna);
 }
 
 bool Tablero::enroqueValido(char color, bool esCorto){//revisa que ninguna de las piezas se haya movido en toda la partida, que tengamos espacio, y que no este en jaque el rey, y que no lo deje en jaque, si todo sale correcto, da true
@@ -251,7 +255,7 @@ bool Tablero::enroqueValido(char color, bool esCorto){//revisa que ninguna de la
         return false;
     }
 
-    if(casillas[fila][columnaRey]->getSeHaMovido() || casillas[fila][columnaTorre]->getSeHaMovido()){
+    if(casillas[(fila)*8+(columnaRey)]->getSeHaMovido() || casillas[(fila)*8+(columnaTorre)]->getSeHaMovido()){
         return false;
     }
 
@@ -308,7 +312,7 @@ void Tablero::imprimir() const{
         int numeroMostrado=8-fila;
         cout<<numeroMostrado<<" |";
         for(int columna=0 ; columna<8 ; columna++){
-            Pieza* pieza=casillas[fila][columna];
+            Pieza* pieza=casillas[(fila)*8+(columna)];
 
             if(pieza==nullptr){
                 cout<<" . |";
@@ -338,7 +342,7 @@ void Tablero::guardarEnArchivo(ofstream &archivo){
         for(int columna=0 ; columna<8 ; columna++){
 
             if(hayPiezaEn(fila,columna)){
-                archivo<<colorEnCasilla(fila,columna)<<" "<<simboloEnCasilla(fila,columna)<<" "<<casillas[fila][columna]->getSeHaMovido()<<endl;
+                archivo<<colorEnCasilla(fila,columna)<<" "<<simboloEnCasilla(fila,columna)<<" "<<casillas[(fila)*8+(columna)]->getSeHaMovido()<<endl;
             }else{
                 archivo<<"-"<<" "<<"-"<<" "<<"0"<<endl;
             }
@@ -371,14 +375,14 @@ void Tablero::cargarDesdeArchivo(ifstream &archivo){
                 piezaNueva=new Caballo(color,fila,columna);
             }else if(simbolo=='A'){
                 piezaNueva=new Alfil(color,fila,columna);
-            }else if(simbolo=='D'){
+            }else if(simbolo=='R'){
                 piezaNueva=new Reina(color,fila,columna);
             }else if(simbolo=='K'){
                 piezaNueva=new Rey(color,fila,columna);
             }
 
             piezaNueva->setSeHaMovido(seHaMovido);
-            casillas[fila][columna]=piezaNueva;
+            casillas[(fila)*8+(columna)]=piezaNueva;
         }
     }
 }

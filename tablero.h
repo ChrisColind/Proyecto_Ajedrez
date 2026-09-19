@@ -8,7 +8,7 @@ using namespace std;
 
 class Tablero{
 private:
-    Pieza* casillas[8][8];
+    Pieza** casillas;
 
     void vaciarCasillas();
     void inicializarPosicionInicial();

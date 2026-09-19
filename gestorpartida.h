@@ -4,6 +4,7 @@
 #include "tablero.h"
 #include "jugador.h"
 #include "historial.h"
+#include "ranking.h"
 
 class GestorPartida{
 private:
@@ -20,6 +21,7 @@ private:
     void guardarPartida();
     Jugador* crearUsuario(string colorEtiqueta);
     Jugador* obtenerJugador(string colorEtiqueta);
+    void mostrarRanking();
 
 
 public:
@@ -29,7 +31,6 @@ public:
     void menu();
     void iniciarPartida();
     void cargarPartida();
-    void mostrarAyuda();
 };
 
 #endif
